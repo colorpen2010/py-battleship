@@ -1,12 +1,17 @@
 class Deck:
-    def __init__(self, row, column, is_alive=True):
+    def __init__(self, row: int, column: int, is_alive: bool = True) -> None:
         self.row = row
         self.column = column
         self.is_alive = is_alive
 
 
 class Ship:
-    def __init__(self, start, end, is_drowned=False):
+    def __init__(
+        self,
+        start: tuple[int, int],
+        end: tuple[int, int],
+        is_drowned: bool = False,
+    ) -> None:
         self.decks = []
         self.is_drowned = is_drowned
         start_row, start_column = start
@@ -16,10 +21,14 @@ class Ship:
         if any(not isinstance(value, int) for value in coordinates):
             raise ValueError("Ship coordinates must be integers")
         if any(not 0 <= value < 10 for value in coordinates):
-            raise ValueError("Ship coordinates must be inside the 10x10 field")
+            raise ValueError(
+                "Ship coordinates must be inside the 10x10 field"
+            )
 
         if start_row != end_row and start_column != end_column:
-            raise ValueError("A ship must be placed horizontally or vertically")
+            raise ValueError(
+                "A ship must be placed horizontally or vertically"
+            )
 
         row_step = (end_row > start_row) - (end_row < start_row)
         column_step = (end_column > start_column) - (
@@ -33,13 +42,13 @@ class Ship:
             row += row_step
             column += column_step
 
-    def get_deck(self, row, column):
+    def get_deck(self, row: int, column: int) -> Deck | None:
         for deck in self.decks:
             if (deck.row, deck.column) == (row, column):
                 return deck
         return None
 
-    def fire(self, row, column):
+    def fire(self, row: int, column: int) -> str:
         deck = self.get_deck(row, column)
         if deck is None or not deck.is_alive:
             return "Miss!"
@@ -50,7 +59,10 @@ class Ship:
 
 
 class Battleship:
-    def __init__(self, ships):
+    def __init__(
+        self,
+        ships: list[tuple[tuple[int, int], tuple[int, int]]],
+    ) -> None:
         # Create a dict `self.field`.
         # Its keys are tuples - the coordinates of the non-empty cells,
         # A value for each cell is a reference to the ship
@@ -65,7 +77,7 @@ class Battleship:
                 self.field[location] = ship
         self._validate_field()
 
-    def _validate_field(self):
+    def _validate_field(self) -> None:
         """Check the standard fleet composition and ship separation."""
         lengths = [len(ship.decks) for ship in self.ships]
         if sorted(lengths) != [1, 1, 1, 1, 2, 2, 2, 3, 3, 4]:
@@ -82,7 +94,7 @@ class Battleship:
                     if neighbor is not None and neighbor is not ship:
                         raise ValueError("Ships cannot touch, even diagonally")
 
-    def fire(self, location: tuple):
+    def fire(self, location: tuple[int, int]) -> str:
         # This function should check whether the location
         # is a key in the `self.field`
         # If it is, then it should check if this cell is the last alive
@@ -93,7 +105,7 @@ class Battleship:
         row, column = location
         return ship.fire(row, column)
 
-    def print_field(self):
+    def print_field(self) -> None:
         """Print the current 10x10 field using the README symbols."""
         for row in range(10):
             cells = []
